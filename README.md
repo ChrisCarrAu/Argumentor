@@ -13,6 +13,8 @@ var argumentor = new Argumentor();
 argumentor.AddSwitch("c", "The number of pings to send", Required.Mandatory);
 // To process an optional switch like so: -t yes
 argumentor.AddSwitch("t", "Tengu maru", Required.Optional);
+// To add a switch with no value like so: -switch
+argumentor.AddSwitch("switch", "A no-value switch", Required.Optional).HasValue = false;
 
 // Add individual arguments by name
 argumentor.AddArgument("host", "The name of the host", Required.Mandatory);
