@@ -28,4 +28,8 @@ var arguments = argumentor.Parse(args);
 // The switches can be found in arguments.GetSwitches()
 // The parameters can be found in arguments.GetParameters()
 
+// To retrieve the value of an argument
+arguments["c"]
+arguments["switch"]
+
 ```
