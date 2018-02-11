@@ -1,4 +1,4 @@
-﻿namespace ArgumentRes.Models
+﻿namespace ArgumentRes.Models.implementations
 {
     /// <summary>
     /// A switch is a command line parameter identified with a switch tag.
@@ -9,7 +9,6 @@
         protected string SwitchFlag = "-";
 
         public string Param { get; set; }
-//        public string ShortName { get; set; }
 
         public override string Id => Param;
         public override string AsParam => $"{OpenMandatoryFlag}{SwitchFlag}{Param} value{CloseMandatoryFlag}";

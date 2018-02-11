@@ -1,4 +1,4 @@
-﻿namespace ArgumentRes.Models
+﻿namespace ArgumentRes.Models.interfaces
 {
     public enum Required
     {

@@ -1,15 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace ArgumentRes.Models
 {
+    /// <summary>
+    /// The result of the parsing operation on a list of string parameters
+    /// </summary>
     public class ParsedArguments
     {
         /// <summary>
         /// Switches found
         /// </summary>
         private readonly ReadOnlyDictionary<string, string> _commandLineSwitches;
+
         /// <summary>
         /// Arguments found
         /// </summary>

@@ -1,10 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using ArgumentRes.Models;
+using ArgumentRes.Models.implementations;
+using ArgumentRes.Models.interfaces;
+using ArgumentRes.Services.interfaces;
+using Switch = ArgumentRes.Models.implementations.Switch;
 
-namespace ArgumentRes.Models
+namespace ArgumentRes.Services.implementations
 {
-    public class Argumentor
+    public class Argumentor : IArgumentor
     {
         /// <summary>
         /// Switches and Arguments that are expected to be present.
@@ -76,6 +82,7 @@ namespace ArgumentRes.Models
         /// </summary>
         private bool ExpectsArgumentList => _expectedArguments.OfType<ArgumentList>().Any();
 
+        /// <inheritdoc />
         public ParsedArguments Parse(IEnumerable<string> args)
         {
             var commandLineSwitches = new Dictionary<string, string>();
@@ -126,7 +133,18 @@ namespace ArgumentRes.Models
                 var argListMinArgs = expectedArgumentList.IsRequired == Required.Mandatory ? 1 : 0;
                 if (expectedArguments.Count + argListMinArgs > commandLineParameters.Count)
                 {
-                    throw new ArgumentException("Expecting parameter/s: " + expectedArguments.Skip(commandLineParameters.Count).Aggregate((current, next) => $"{current}, {next}"));
+                    var missingParameters = expectedArguments.Skip(commandLineParameters.Count).ToList();
+                    if (missingParameters.Count() > 1)
+                    {
+                        throw new ArgumentException("Expecting parameter/s: " +
+                                                    missingParameters.Aggregate((current, next) =>
+                                                        $"{current}, {next}"));
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Expecting parameter");
+
+                    }
                 }
             }
             else if (expectedArguments.Count < commandLineParameters.Count)
@@ -141,6 +159,16 @@ namespace ArgumentRes.Models
             return new ParsedArguments(commandLineSwitches, commandLineParameters);
         }
 
+        /// <summary>
+        /// Uses the application process name as the command name.
+        /// </summary>
+        /// <returns></returns>
+        public string Usage()
+        {
+            return Usage(Process.GetCurrentProcess().ProcessName);
+        }
+
+        /// <inheritdoc />
         public string Usage(string command)
         {
             var maxParamLength = _expectedArguments.Max(arg => arg.Id.Length);

@@ -1,4 +1,5 @@
-﻿using ArgumentRes.Models;
+﻿using ArgumentRes.Models.interfaces;
+using ArgumentRes.Services.implementations;
 using System;
 
 namespace ArgumentHandler
@@ -35,7 +36,7 @@ namespace ArgumentHandler
                 Console.Write("ERROR ");
                 Console.WriteLine(e.Message);
                 Console.WriteLine();
-                Console.WriteLine(argumentor.Usage("ping"));
+                Console.WriteLine(argumentor.Usage());
             }
 
             Console.ReadLine();

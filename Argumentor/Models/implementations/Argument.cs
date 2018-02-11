@@ -1,9 +1,11 @@
-﻿namespace ArgumentRes.Models
+﻿using ArgumentRes.Models.interfaces;
+
+namespace ArgumentRes.Models.implementations
 {
     /// <summary>
     /// An argument is a solitary command line parameter which is not a switch
     /// </summary>
-    public class Argument : Parameter
+    public class Argument : ParameterImpl, IParameter
     {
         /// <summary>
         /// The name of the parameter 
