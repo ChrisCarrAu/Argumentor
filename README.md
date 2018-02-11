@@ -1,4 +1,4 @@
-# ArgumentHandler
+# Argumentor - Argument Handler
 Command Line Argument processor
 
 <h2>Instructions</h2>
