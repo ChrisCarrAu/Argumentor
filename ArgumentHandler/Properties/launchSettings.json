@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ArgumentHandler": {
+      "commandName": "Project",
+      "commandLineArgs": "-c 100 finagle -v poopoo Oh freddled gruntbuggly,: Thy micturations are to me,(with big yawning): As plurdled gabbleblotchits,: On a lurgid bee,"
+    }
+  }
+}
