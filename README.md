@@ -33,3 +33,22 @@ arguments["c"]
 arguments["switch"]
 
 ```
+
+If invalid arguments are passed to the parser, an ArgumentException is thrown. The Usage information can be displayed by making a call to
+
+```C#
+argumentor.Usage("ArgumentHandler")
+```
+
+ERROR Expecting switches: v
+
+ArgumentHandler -c value [-t value] [-u value] -v value [-w value] [-x value] host ...
+ c    : The number of pings to send
+ t    : Tengu maru
+ u    : Umbrella count
+ v    : Victor is an exceedingly handsome fellow
+ w    : With enough help, anything is possible
+ x    : x-rays
+ host : The name of the host
+ ...  : files to process
+
