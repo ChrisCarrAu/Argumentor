@@ -14,6 +14,7 @@ namespace ArgumentHandler
             argumentor.AddSwitch("u", "Umbrella count for those days when the rain doth pour in buckets and the hoi polloi do cower in corners and alleyways in fear of becoming wettened and soggy", Required.Optional);
             argumentor.AddSwitch("v", "Victor is an exceedingly handsome fellow", Required.Mandatory);
             argumentor.AddSwitch("w", "With enough help, anything is possible", Required.Optional);
+            argumentor.AddSwitch("x", "With enough help, anything is possible", Required.Optional).HasValue = false;
             argumentor.AddArgument("host", "The name of the host", Required.Mandatory);
             argumentor.AddArguments("files to process", Required.Mandatory);
 

@@ -9,6 +9,7 @@
         protected string SwitchFlag = "-";
 
         public string Param { get; set; }
+        public bool HasValue { get; set; } = true;
 
         public override string Id => Param;
         public override string AsParam => $"{OpenMandatoryFlag}{SwitchFlag}{Param} value{CloseMandatoryFlag}";

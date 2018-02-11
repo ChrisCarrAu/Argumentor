@@ -41,9 +41,11 @@ namespace ArgumentRes.Services.implementations
         /// <param name="shortDescription"></param>
         /// <param name="friendlyDescription"></param>
         /// <param name="required"></param>
-        public void AddSwitch(string param, string friendlyDescription, Required required)
+        public Switch AddSwitch(string param, string friendlyDescription, Required required)
         {
-            _expectedArguments.Add(new Switch { Param = param, FriendlyDescription = friendlyDescription, IsRequired = required });
+            var switchX = new Switch {Param = param, FriendlyDescription = friendlyDescription, IsRequired = required};
+            _expectedArguments.Add(switchX);
+            return switchX;
         }
 
         /// <summary>
@@ -98,8 +100,14 @@ namespace ArgumentRes.Services.implementations
                 }
                 else if (arg.StartsWith(_switchTag, System.StringComparison.Ordinal))
                 {
-                    // argument
+                    // Switch
                     param = arg.Substring(1);
+                    if (_expectedArguments.OfType<Switch>().Any(a => a.Param.Equals(param) && !a.HasValue))
+                    {
+                        // Switch has no value
+                        commandLineSwitches[param] = "";
+                        param = null;
+                    }
                 }
                 else
                 {

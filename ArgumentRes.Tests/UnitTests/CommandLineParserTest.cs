@@ -10,6 +10,19 @@ namespace ArgumentRes.Tests.UnitTests
     public class CommandLineParserTest
     {
         [Fact]
+        public void OnParse_OnlySwitchWithNoValue_ParsesCorrectly()
+        {
+            var argumentor = new Argumentor();
+            argumentor.AddSwitch("switch", "switch details", Required.Mandatory).HasValue = false;
+            var arguments = argumentor.Parse(new string[] { "-switch" });
+
+            Assert.Equal("", arguments["switch"]);
+            Assert.Empty(arguments.GetParameters());
+            Assert.Single(arguments.GetSwitches());
+
+        }
+
+        [Fact]
         public void OnParse_OnlyArgumentsMandatoryWithOneArgument_ParsesCorrectly()
         {
             var argumentor = new Argumentor();
