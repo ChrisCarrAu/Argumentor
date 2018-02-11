@@ -39,7 +39,7 @@ If invalid arguments are passed to the parser, an ArgumentException is thrown. T
 ```C#
 argumentor.Usage("ArgumentHandler")
 ```
-
+```
 ERROR Expecting switches: v
 
 ArgumentHandler -c value [-t value] [-u value] -v value [-w value] [-x value] host ...
@@ -51,4 +51,4 @@ ArgumentHandler -c value [-t value] [-u value] -v value [-w value] [-x value] ho
  x    : x-rays
  host : The name of the host
  ...  : files to process
-
+```
