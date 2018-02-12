@@ -7,24 +7,24 @@ Command Line Argument processor
 // Define the parameters you expect by creating a class
 internal class Arguments
 {
-	// For example, to process a mandatory switch like so: -c 100
+    // For example, to process a mandatory switch like so: -c 100
     [Switch(Key = "c", Description="Number of pings to send")]
     [Mandatory]
     public int Pings { get; set; }
 
-	// To process an optional switch like so: -t yes
+    // To process an optional switch like so: -t yes
     [Switch(Key = "t", Description = "Tengu Maru")]
     public string TenguMaru { get; set; }
 
-	// To add a boolean switch with no value like so: -switch
-    [Switch(Key = "x", Description = "no value")]
-    public bool IsSet { get; set; }
+    // To add a boolean switch with no value like so: -switch
+    [Switch(Key = "switch", Description = "no value")]
+    public bool Switch { get; set; }
 
-	// Add individual parameter arguments by name.
+    // Add individual parameter arguments by name.
     [Parameter(Key = "host", Description = "The name of the host")]
     public string Host { get; set; }
 
-	// Add zero or more arguments (one or more if mandatory) as the last property.
+    // Add zero or more arguments (one or more if mandatory) as the last property.
     [Parameter(Key = "...", Description = "Files to process")]
     public List<string> FilesToProcess { get; set; }
 }
@@ -37,7 +37,7 @@ var arguments = argumentor.Parse(args);
 
 // To retrieve the value of an argument
 arguments.Pings
-arguments.IsSet
+arguments.Switch
 
 ```
 
