@@ -25,6 +25,27 @@ namespace ArgumentRes.Tests.UnitTests
             [Parameter(Key = "args", Description = "Arguments")]
             public List<string> Arguments { get; set; }
         }
+        public class Arguments_Complex
+        {
+            [Switch(Key = "c", Description = "The number of pings to send")]
+            [Mandatory]
+            public int Pings { get; set; }
+            [Switch(Key = "t", Description = "Tengu maru")]
+            public string TenguMaru { get; set; }
+            [Switch(Key = "u", Description = "Umbrella count for those days when the rain doth pour in buckets and the hoi polloi do cower in corners and alleyways in fear of becoming wettened and soggy")]
+            public string Umbrella { get; set; }
+            [Mandatory]
+            [Switch(Key = "v", Description = "Victor is an exceedingly handsome fellow")]
+            public string Victor { get; set; }
+            [Switch(Key = "w", Description = "With enough help, anything is possible")]
+            public string Whisky { get; set; }
+            [Parameter(Key = "host", Description = "The name of the host")]
+            [Mandatory]
+            public string Host { get; set; }
+            [Parameter(Key = "args", Description = "Arguments")]
+            public List<string> Arguments { get; set; }
+        }
+
 
         [Fact]
         public void OnParse_OnlySwitchWithNoValue_ParsesCorrectly()
@@ -76,33 +97,22 @@ namespace ArgumentRes.Tests.UnitTests
             Assert.Equal(17, arguments.Arguments.Count);
         }
         
-        /*
         [Fact]
         public void OnParse_ComplexArguments_ParsesCorrectly()
         {
-            var argumentor = new Argumentor();
-            argumentor.AddSwitch("c", "The number of pings to send", Required.Mandatory);
-            argumentor.AddSwitch("t", "Tengu maru", Required.Optional);
-            argumentor.AddSwitch("u", "Umbrella count for those days when the rain doth pour in buckets and the hoi polloi do cower in corners and alleyways in fear of becoming wettened and soggy", Required.Optional);
-            argumentor.AddSwitch("v", "Victor is an exceedingly handsome fellow", Required.Mandatory);
-            argumentor.AddSwitch("w", "With enough help, anything is possible", Required.Optional);
-            argumentor.AddArgument("host", "The name of the host", Required.Mandatory);
-            argumentor.AddArguments("files to process", Required.Mandatory);
-
+            var argumentor = new Argumentor<Arguments_Complex>();
             var arguments = argumentor.Parse(ComplexArgs());
 
-            Assert.Equal("100", arguments["c"]);
-            Assert.Equal("tinkle", arguments["v"]);
-            Assert.Equal("finagle", arguments["host"]);
-            Assert.Equal("Oh", arguments["1"]);
-            Assert.Equal("freddled", arguments["2"]);
-            Assert.Equal("gruntbuggly,:", arguments["3"]);
-            Assert.Equal("bee,", arguments["17"]);
+            Assert.Equal(100, arguments.Pings);
+            Assert.Equal("tinkle", arguments.Victor);
+            Assert.Equal("finagle", arguments.Host);
+            Assert.Equal("Oh", arguments.Arguments[0]);
+            Assert.Equal("freddled", arguments.Arguments[1]);
+            Assert.Equal("gruntbuggly,:", arguments.Arguments[2]);
+            Assert.Equal("bee,", arguments.Arguments[16]);
 
-            Assert.Equal(18, arguments.GetParameters().Count());
-            Assert.Equal(2, arguments.GetSwitches().Count());
+            Assert.Equal(17, arguments.Arguments.Count);
         }
-        */
 
         private IEnumerable<string> ComplexArgs()
         {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ArgumentRes.Attributes
+﻿namespace ArgumentRes.Attributes
 {
     public class ParameterAttribute : ArgumentAttribute
     {
