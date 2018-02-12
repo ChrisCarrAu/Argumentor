@@ -4,33 +4,40 @@ Command Line Argument processor
 <h2>Instructions</h2>
 
 ```C#
+// Define the parameters you expect by creating a class
+internal class Arguments
+{
+	// For example, to process a mandatory switch like so: -c 100
+    [Switch(Key = "c", Description="Number of pings to send")]
+    [Mandatory]
+    public int Pings { get; set; }
+
+	// To process an optional switch like so: -t yes
+    [Switch(Key = "t", Description = "Tengu Maru")]
+    public string TenguMaru { get; set; }
+
+	// To add a boolean switch with no value like so: -switch
+    [Switch(Key = "x", Description = "no value")]
+    public bool IsSet { get; set; }
+
+	// Add individual parameter arguments by name.
+    [Parameter(Key = "host", Description = "The name of the host")]
+    public string Host { get; set; }
+
+	// Add zero or more arguments (one or more if mandatory) as the last property.
+    [Parameter(Key = "...", Description = "Files to process")]
+    public List<string> FilesToProcess { get; set; }
+}
 
 // Create an instance of the Argument processor
-var argumentor = new Argumentor();
+var argumentor = new Argumentor<Arguments>();
 
-// Add command line switches - give them a description and mark them as mandatory or optional
-// For example, to process a switch like so: -c 100
-argumentor.AddSwitch("c", "The number of pings to send", Required.Mandatory);
-// To process an optional switch like so: -t yes
-argumentor.AddSwitch("t", "Tengu maru", Required.Optional);
-// To add a switch with no value like so: -switch
-argumentor.AddSwitch("switch", "A no-value switch", Required.Optional).HasValue = false;
-
-// Add individual arguments by name
-argumentor.AddArgument("host", "The name of the host", Required.Mandatory);
-
-// Add zero or more arguments (one or more if mandatory). These arguments are keyed by their ordinal position.
-argumentor.AddArguments("files to process", Required.Mandatory);
-
-// To parse the command line arguments:
+// Parse the command line arguments:
 var arguments = argumentor.Parse(args);
 
-// The switches can be found in arguments.GetSwitches()
-// The parameters can be found in arguments.GetParameters()
-
 // To retrieve the value of an argument
-arguments["c"]
-arguments["switch"]
+arguments.Pings
+arguments.IsSet
 
 ```
 

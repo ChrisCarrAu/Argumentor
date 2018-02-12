@@ -7,14 +7,13 @@ namespace ArgumentHandler
 {
     internal class Program
     {
-        public class Arguments
+        internal class Arguments
         {
             [Switch(Key = "c", Description="Number of pings to send")]
             [Mandatory]
             public int Pings { get; set; }
 
             [Switch(Key = "t", Description = "Tengu Maru")]
-            [Mandatory]
             public string TenguMaru { get; set; }
 
             [Switch(Key = "x", Description = "no value")]
@@ -25,11 +24,9 @@ namespace ArgumentHandler
             public string VictoryName { get; set; }
 
             [Parameter(Key = "host", Description = "The name of the host")]
-            [Mandatory]
             public string Host { get; set; }
 
             [Parameter(Key = "...", Description = "Files to process")]
-            [Mandatory]
             public List<string> FilesToProcess { get; set; }
         }
 
