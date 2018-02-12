@@ -5,11 +5,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using ArgumentRes.Services.interfaces;
 using SwitchAttribute = ArgumentRes.Attributes.SwitchAttribute;
 
 namespace ArgumentRes.Services.implementations
 {
-    public class Argumentor<T> where T : new()
+    public class Argumentor<T> : IArgumentor<T> where T : new()
     {
         /// <summary>
         /// Switches and Arguments that are expected to be present.
@@ -46,7 +47,7 @@ namespace ArgumentRes.Services.implementations
             {
                 var attributes = property.GetCustomAttributes(true);
 
-                var switchAttribute = attributes.OfType<Attributes.SwitchAttribute>().FirstOrDefault();
+                var switchAttribute = attributes.OfType<SwitchAttribute>().FirstOrDefault();
                 var parameterAttribute = attributes.OfType<ParameterAttribute>().FirstOrDefault();
                 var mandatoryAttribute = attributes.OfType<MandatoryAttribute>().FirstOrDefault();
 
@@ -149,25 +150,25 @@ namespace ArgumentRes.Services.implementations
             {
                 var attributes = property.GetCustomAttributes(true);
 
-                var argumentAttribute = attributes.OfType<Attributes.ArgumentAttribute>().FirstOrDefault();
+                var argumentAttribute = attributes.OfType<ArgumentAttribute>().FirstOrDefault();
                 var mandatoryAttribute = attributes.OfType<MandatoryAttribute>().FirstOrDefault();
 
-                if (null != argumentAttribute)
+                if (null == argumentAttribute)
+                    continue;
+
+                var mandatory = (null != mandatoryAttribute);
+                var name = property.Name;
+
+                if (property.PropertyType == typeof(bool)) name = "";
+
+                arguments.Add(new Argument
                 {
-                    bool mandatory = (null != mandatoryAttribute);
-                    string name = property.Name;
-
-                    if (property.PropertyType == typeof(bool)) name = "";
-
-                    arguments.Add(new Argument
-                    {
-                        IsSwitch = (argumentAttribute is SwitchAttribute),
-                        Key = (argumentAttribute is SwitchAttribute ? "-" : "") + argumentAttribute.Key,
-                        Name = name,
-                        Description = argumentAttribute.Description,
-                        Mandatory = mandatory,
-                    });
-                }
+                    IsSwitch = (argumentAttribute is SwitchAttribute),
+                    Key = (argumentAttribute is SwitchAttribute ? "-" : "") + argumentAttribute.Key,
+                    Name = name,
+                    Description = argumentAttribute.Description,
+                    Mandatory = mandatory,
+                });
             }
 
             var maxParamLength = arguments.Max(arg => arg.Key.Length);

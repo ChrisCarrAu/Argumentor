@@ -2,7 +2,7 @@
 
 namespace ArgumentRes.Services.interfaces
 {
-    public interface IArgumentor
+    public interface IArgumentor<T>
     {
         /// <summary>
         /// Takes an array of strings - for example, from a command line 
@@ -13,7 +13,7 @@ namespace ArgumentRes.Services.interfaces
         /// </summary>
         /// <param name="args">Arguments to parse</param>
         /// <returns>Parsed arguments</returns>
-        T Parse<T>(IEnumerable<string> args) where T : new();
+        T Parse(IEnumerable<string> args);
 
         /// <summary>
         /// Returns a Usage string which can be displayed to the console.
