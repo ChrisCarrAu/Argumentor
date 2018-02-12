@@ -1,5 +1,4 @@
-﻿using ArgumentRes.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace ArgumentRes.Services.interfaces
 {
@@ -14,7 +13,7 @@ namespace ArgumentRes.Services.interfaces
         /// </summary>
         /// <param name="args">Arguments to parse</param>
         /// <returns>Parsed arguments</returns>
-        ParsedArguments Parse(IEnumerable<string> args);
+        T Parse<T>(IEnumerable<string> args) where T : new();
 
         /// <summary>
         /// Returns a Usage string which can be displayed to the console.

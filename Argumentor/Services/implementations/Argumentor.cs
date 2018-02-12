@@ -1,21 +1,20 @@
-﻿using System;
+﻿using ArgumentRes.Attributes;
+using ArgumentRes.Models;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using ArgumentRes.Models;
-using ArgumentRes.Models.implementations;
-using ArgumentRes.Models.interfaces;
-using ArgumentRes.Services.interfaces;
-using Switch = ArgumentRes.Models.implementations.Switch;
+using System.Reflection;
+using SwitchAttribute = ArgumentRes.Attributes.SwitchAttribute;
 
 namespace ArgumentRes.Services.implementations
 {
-    public class Argumentor : IArgumentor
+    public class Argumentor<T> where T : new()
     {
         /// <summary>
         /// Switches and Arguments that are expected to be present.
         /// </summary>
-        private readonly List<IParameter> _expectedArguments = new List<IParameter>();
+        //private readonly List<IParameter> _expectedArguments = new List<IParameter>();
         private readonly string _switchTag;
 
         /// <summary>
@@ -34,137 +33,100 @@ namespace ArgumentRes.Services.implementations
             _switchTag = switchTag;
         }
 
-        /// <summary>
-        /// Add an expected switch parameter
-        /// </summary>
-        /// <param name="param">Parameter id - this is used to identify the parameter</param>
-        /// <param name="shortDescription"></param>
-        /// <param name="friendlyDescription"></param>
-        /// <param name="required"></param>
-        public Switch AddSwitch(string param, string friendlyDescription, Required required)
-        {
-            var switchX = new Switch {Param = param, FriendlyDescription = friendlyDescription, IsRequired = required};
-            _expectedArguments.Add(switchX);
-            return switchX;
-        }
-
-        /// <summary>
-        /// Adds an expected command line argument parameter
-        /// </summary>
-        /// <param name="shortDescription"></param>
-        /// <param name="friendlyDescription"></param>
-        /// <param name="required"></param>
-        public void AddArgument(string shortDescription, string friendlyDescription, Required required)
-        {
-            if (ExpectsArgumentList)
-            {
-                throw new ArgumentException("Argument List must be the last argument exoected");
-            }
-
-            _expectedArguments.Add(new Argument { ShortName = shortDescription, FriendlyDescription = friendlyDescription, IsRequired = required });
-        }
-
-        /// <summary>
-        /// Adds expected command line arguments
-        /// </summary>
-        /// <param name="friendlyDescription">Description of the command line arguments</param>
-        /// <param name="required">if optional, expects 0 or more parameters. if mandatory, expects 1 or more parameters</param>
-        public void AddArguments(string friendlyDescription, Required required)
-        {
-            if (ExpectsArgumentList)
-            {
-                throw new ArgumentException("Only one argument list is permitted.");
-            }
-
-            _expectedArguments.Add(new ArgumentList { FriendlyDescription = friendlyDescription, IsRequired = required });
-        }
-
-        /// <summary>
-        /// Returns true if 
-        /// </summary>
-        private bool ExpectsArgumentList => _expectedArguments.OfType<ArgumentList>().Any();
-
         /// <inheritdoc />
-        public ParsedArguments Parse(IEnumerable<string> args)
+        public T Parse(IEnumerable<string> args)
         {
-            var commandLineSwitches = new Dictionary<string, string>();
-            var commandLineParameters = new Dictionary<string, string>();
+            var commandLineSwitches = new Dictionary<string, PropertyInfo>();
+            var commandLineParameters = new List<PropertyInfo>();
+            var mandatoryArguments = new List<PropertyInfo>();
 
+            var returnValue = new T();
+            var properties = returnValue.GetType().GetProperties();
+            foreach (var property in properties)
+            {
+                var attributes = property.GetCustomAttributes(true);
+
+                var switchAttribute = attributes.OfType<Attributes.SwitchAttribute>().FirstOrDefault();
+                var parameterAttribute = attributes.OfType<ParameterAttribute>().FirstOrDefault();
+                var mandatoryAttribute = attributes.OfType<MandatoryAttribute>().FirstOrDefault();
+
+                if (null != switchAttribute)
+                { 
+                    commandLineSwitches.Add(switchAttribute.Key, property);
+                }
+                if (null != parameterAttribute)
+                {
+                    commandLineParameters.Add(property);
+                }
+                if (null != mandatoryAttribute)
+                {
+                    mandatoryArguments.Add(property);
+                }
+            }
+
+            var propertyNumber = 0;
             string param = null;
             foreach (var arg in args)
             {
                 if (null != param)
                 {
-                    commandLineSwitches[param] = arg;
+                    var propertyInfo = commandLineSwitches[param];
+                    propertyInfo.SetValue(returnValue, Convert.ChangeType(arg, propertyInfo.PropertyType), null);
                     param = null;
+
+                    if (mandatoryArguments.Contains(propertyInfo))
+                    {
+                        mandatoryArguments.Remove(propertyInfo);
+                    }
                 }
                 else if (arg.StartsWith(_switchTag, System.StringComparison.Ordinal))
                 {
-                    // Switch
+                    // Switch - strip switch flag from front
                     param = arg.Substring(1);
-                    if (_expectedArguments.OfType<Switch>().Any(a => a.Param.Equals(param) && !a.HasValue))
+                    if (commandLineSwitches.ContainsKey(param) && commandLineSwitches[param].PropertyType == typeof(bool))
                     {
-                        // Switch has no value
-                        commandLineSwitches[param] = "";
+                        var propertyInfo = commandLineSwitches[param];
+                        propertyInfo.SetValue(returnValue, true);
                         param = null;
+
+                        if (mandatoryArguments.Contains(propertyInfo))
+                        {
+                            mandatoryArguments.Remove(propertyInfo);
+                        }
                     }
                 }
                 else
                 {
-                    var expectedArgs = _expectedArguments.OfType<Argument>().Select(argv => argv.ShortName).ToList();
-                    var nextParam = commandLineParameters.Count;
-                    if (nextParam < expectedArgs.Count)
+                    var propertyInfo = commandLineParameters[propertyNumber];
+                    if (propertyInfo.PropertyType == typeof(List<string>))
                     {
-                        commandLineParameters[expectedArgs[nextParam]] = arg;
-                    }
-                    else if (ExpectsArgumentList)
-                    {
-                        commandLineParameters[nextParam.ToString()] = arg;
-                    }
-                }
-            }
-
-            var missingSwitches = _expectedArguments
-                .OfType<Switch>()
-                .Where(arg => arg.IsRequired == Required.Mandatory && !commandLineSwitches.ContainsKey(arg.Param))
-                .Select(arg => arg.Id).ToList();
-
-            if (missingSwitches.Any())
-            {
-                throw new ArgumentException("Expecting switches: " + missingSwitches.Aggregate((current, next) => $"{current}, {next}"));
-            }
-            var expectedArguments = _expectedArguments.OfType<Argument>().Select(arg => arg.ShortName).ToList();
-            var expectedArgumentList = _expectedArguments.OfType<ArgumentList>().FirstOrDefault();
-
-            if (null != expectedArgumentList)
-            {
-                var argListMinArgs = expectedArgumentList.IsRequired == Required.Mandatory ? 1 : 0;
-                if (expectedArguments.Count + argListMinArgs > commandLineParameters.Count)
-                {
-                    var missingParameters = expectedArguments.Skip(commandLineParameters.Count).ToList();
-                    if (missingParameters.Count() > 1)
-                    {
-                        throw new ArgumentException("Expecting parameter/s: " +
-                                                    missingParameters.Aggregate((current, next) =>
-                                                        $"{current}, {next}"));
+                        var list = (List<string>) propertyInfo.GetValue(returnValue);
+                        if (null == list)
+                        {
+                            list = new List<string>();
+                            propertyInfo.SetValue(returnValue, list, null);
+                        }
+                        list.Add(arg);
                     }
                     else
                     {
-                        throw new ArgumentException("Expecting parameter");
+                        propertyInfo.SetValue(returnValue, arg);
+                        propertyNumber++;
+                    }
 
+                    if (mandatoryArguments.Contains(propertyInfo))
+                    {
+                        mandatoryArguments.Remove(propertyInfo);
                     }
                 }
             }
-            else if (expectedArguments.Count < commandLineParameters.Count)
+
+            if (mandatoryArguments.Count > 0)
             {
-                throw new ArgumentException("Invalid parameter/s: " + commandLineParameters.Skip(expectedArguments.Count).Select(arg => arg.Key).Aggregate((current, next) => $"{current}, {next}"));
-            }
-            else if (expectedArguments.Count > commandLineParameters.Count)
-            {
-                throw new ArgumentException("Expecting parameter/s: " + expectedArguments.Skip(commandLineParameters.Count).Aggregate((current, next) => $"{current}, {next}"));
+                throw new ArgumentException("Expecting parameter/s " + mandatoryArguments.Select(arg => arg.Name).Aggregate((current, next) => $"{current}, {next}"));
             }
 
-            return new ParsedArguments(commandLineSwitches, commandLineParameters);
+            return returnValue;
         }
 
         /// <summary>
@@ -179,12 +141,41 @@ namespace ArgumentRes.Services.implementations
         /// <inheritdoc />
         public string Usage(string command)
         {
-            var maxParamLength = _expectedArguments.Max(arg => arg.Id.Length);
+            var arguments = new List<Argument>();
+
+            var dummy = new T();
+            var properties = dummy.GetType().GetProperties();
+            foreach (var property in properties)
+            {
+                var attributes = property.GetCustomAttributes(true);
+
+                var argumentAttribute = attributes.OfType<Attributes.ArgumentAttribute>().FirstOrDefault();
+                var mandatoryAttribute = attributes.OfType<MandatoryAttribute>().FirstOrDefault();
+
+                if (null != argumentAttribute)
+                {
+                    bool mandatory = (null != mandatoryAttribute);
+                    string name = property.Name;
+
+                    if (property.PropertyType == typeof(bool)) name = "";
+
+                    arguments.Add(new Argument
+                    {
+                        IsSwitch = (argumentAttribute is SwitchAttribute),
+                        Key = (argumentAttribute is SwitchAttribute ? "-" : "") + argumentAttribute.Key,
+                        Name = name,
+                        Description = argumentAttribute.Description,
+                        Mandatory = mandatory,
+                    });
+                }
+            }
+
+            var maxParamLength = arguments.Max(arg => arg.Key.Length);
 
             return $"{command} " 
-                + _expectedArguments.Select(arg => arg.AsParam).Aggregate((current, next) => $"{current} {next}") 
+                + arguments.Select(arg => arg.AsParam).Aggregate((current, next) => $"{current} {next}") 
                 + "\n "
-                + _expectedArguments.Select(arg => arg.UsageString(maxParamLength)).Aggregate((current, next) => $"{current}\n {next}");
+                + arguments.Select(arg => arg.UsageString(maxParamLength)).Aggregate((current, next) => $"{current}\n {next}");
         }
     }
 }

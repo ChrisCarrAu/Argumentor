@@ -1,15 +1,43 @@
-﻿using ArgumentRes.Models.interfaces;
+﻿using ArgumentRes.Attributes;
 using ArgumentRes.Services.implementations;
 using System;
+using System.Collections.Generic;
 
 namespace ArgumentHandler
 {
     internal class Program
     {
+        public class Arguments
+        {
+            [Switch(Key = "c", Description="Number of pings to send")]
+            [Mandatory]
+            public int Pings { get; set; }
+
+            [Switch(Key = "t", Description = "Tengu Maru")]
+            [Mandatory]
+            public string TenguMaru { get; set; }
+
+            [Switch(Key = "x", Description = "no value")]
+            [Mandatory]
+            public bool IsSet { get; set; }
+
+            [Switch(Key = "v", Description = "Victory Name")]
+            public string VictoryName { get; set; }
+
+            [Parameter(Key = "host", Description = "The name of the host")]
+            [Mandatory]
+            public string Host { get; set; }
+
+            [Parameter(Key = "...", Description = "Files to process")]
+            [Mandatory]
+            public List<string> FilesToProcess { get; set; }
+        }
+
         private static void Main(string[] args)
         {
-            var argumentor = new Argumentor();
-            argumentor.AddSwitch("c", "The number of pings to send", Required.Mandatory);
+            var argumentor = new Argumentor<Arguments>();
+            /*
+             * argumentor.AddSwitch("c", "The number of pings to send", Required.Mandatory);
             argumentor.AddSwitch("t", "Tengu maru", Required.Optional);
             argumentor.AddSwitch("u", "Umbrella count for those days when the rain doth pour in buckets and the hoi polloi do cower in corners and alleyways in fear of becoming wettened and soggy", Required.Optional);
             argumentor.AddSwitch("v", "Victor is an exceedingly handsome fellow", Required.Mandatory);
@@ -17,20 +45,13 @@ namespace ArgumentHandler
             argumentor.AddSwitch("x", "With enough help, anything is possible", Required.Optional).HasValue = false;
             argumentor.AddArgument("host", "The name of the host", Required.Mandatory);
             argumentor.AddArguments("files to process", Required.Mandatory);
+            */
 
             try
             {
-                var arguments = argumentor.Parse(args);
+                var commandLineArguments = argumentor.Parse(args);
 
-                foreach (var kvp in arguments.GetSwitches())
-                {
-                    Console.WriteLine($"{kvp.Key}: {kvp.Value}");
-                }
-
-                foreach (var kvp in arguments.GetParameters())
-                {
-                    Console.WriteLine($"{kvp.Key}: {kvp.Value}");
-                }
+                Console.WriteLine($"Pings: {commandLineArguments.Pings}");
             }
             catch (Exception e)
             {
