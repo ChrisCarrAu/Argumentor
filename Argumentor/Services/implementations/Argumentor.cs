@@ -1,25 +1,30 @@
 ﻿using ArgumentRes.Attributes;
 using ArgumentRes.Models;
+using ArgumentRes.Services.interfaces;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using ArgumentRes.Services.interfaces;
 using SwitchAttribute = ArgumentRes.Attributes.SwitchAttribute;
 
 namespace ArgumentRes.Services.implementations
 {
     public class Argumentor<T> : IArgumentor<T> where T : new()
     {
+        private const int Defaultscreenwidth = 80;
+
         /// <summary>
         /// Switches and Arguments that are expected to be present.
         /// </summary>
-        //private readonly List<IParameter> _expectedArguments = new List<IParameter>();
         private readonly string _switchTag;
 
         /// <summary>
-        /// Default constructor - sets switch flag to -
+        /// Width of screen
+        /// </summary>
+        public int ScreenWidth { get; private set; }
+
+        /// <summary>
+        /// Default constructor - sets switch flag to a hyphen (-)
         /// </summary>
         public Argumentor() : this("-")
         {
@@ -28,10 +33,12 @@ namespace ArgumentRes.Services.implementations
         /// <summary>
         /// Constructor with ability to set the switch flag
         /// </summary>
-        /// <param name="switchTag"></param>
-        public Argumentor(string switchTag)
+        /// <param name="switchTag">Tag to use for switches - defaults to hyphen (-)</param>
+        /// <param name="screenWidth">Screen width (to wrap usage comments) defaults to 80</param>
+        public Argumentor(string switchTag, int screenWidth = Defaultscreenwidth)
         {
             _switchTag = switchTag;
+            ScreenWidth = screenWidth;
         }
 
         /// <inheritdoc />
@@ -186,7 +193,7 @@ namespace ArgumentRes.Services.implementations
 
             foreach (var arg in arguments)
             {
-                arg.Description = Wrap(arg.Description, maxParamLength + 3, 80);
+                arg.Description = Wrap(arg.Description, maxParamLength + 3, ScreenWidth);
             }
 
             return $"{command} " 
