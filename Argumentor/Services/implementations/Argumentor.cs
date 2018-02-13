@@ -39,7 +39,7 @@ namespace ArgumentRes.Services.implementations
         {
             var commandLineSwitches = new Dictionary<string, PropertyInfo>();
             var commandLineParameters = new List<PropertyInfo>();
-            var mandatoryArguments = new List<PropertyInfo>();
+            var mandatoryArguments = new Dictionary<PropertyInfo, string>();
 
             // Value to return after successful parsing.
             var returnValue = new T();
@@ -58,13 +58,19 @@ namespace ArgumentRes.Services.implementations
                 { 
                     commandLineSwitches.Add(switchAttribute.Key, property);
                 }
-                if (null != parameterAttribute)
+                else if (null != parameterAttribute)
                 {
                     commandLineParameters.Add(property);
                 }
+                else
+                {
+                    // Skip this one - property is neither a switch, nor a parameter
+                    continue;
+                }
+
                 if (null != mandatoryAttribute)
                 {
-                    mandatoryArguments.Add(property);
+                    mandatoryArguments[property] = (switchAttribute == null ? parameterAttribute.Key : switchAttribute.Key);
                 }
             }
 
@@ -127,7 +133,7 @@ namespace ArgumentRes.Services.implementations
             // If all mandatory arguments have been set, then this list should be empty
             if (mandatoryArguments.Count > 0)
             {
-                throw new ArgumentException("Expecting parameter/s " + mandatoryArguments.Select(arg => arg.Name).Aggregate((current, next) => $"{current}, {next}"));
+                throw new ArgumentException("Expecting parameter/s " + mandatoryArguments.Select(arg => arg.Value).Aggregate((current, next) => $"{current}, {next}"));
             }
 
             return returnValue;
