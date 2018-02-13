@@ -139,7 +139,7 @@ namespace ArgumentRes.Services.implementations
         /// <returns></returns>
         public string Usage()
         {
-            return Usage(Process.GetCurrentProcess().ProcessName);
+            return Usage(System.AppDomain.CurrentDomain.FriendlyName);
         }
 
         /// <inheritdoc />
