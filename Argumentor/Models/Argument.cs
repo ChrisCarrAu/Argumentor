@@ -22,6 +22,6 @@
         /// <summary>
         /// Returns the name of this parameter and the corresponding description for the Usage output
         /// </summary>
-        public string UsageString(int paramLength) => $"{Key.PadRight(paramLength)} : {Description}";
+        public string UsageString(int paramLength) => $"{Key.PadRight(paramLength)} {Description}";
     }
 }

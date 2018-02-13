@@ -41,8 +41,11 @@ namespace ArgumentRes.Services.implementations
             var commandLineParameters = new List<PropertyInfo>();
             var mandatoryArguments = new List<PropertyInfo>();
 
+            // Value to return after successful parsing.
             var returnValue = new T();
             var properties = returnValue.GetType().GetProperties();
+
+            // Build up the attributes for each property on T
             foreach (var property in properties)
             {
                 var attributes = property.GetCustomAttributes(true);
@@ -71,6 +74,7 @@ namespace ArgumentRes.Services.implementations
             {
                 if (null != param)
                 {
+                    // Expecting a switch parameter
                     var propertyInfo = commandLineSwitches[param];
                     propertyInfo.SetValue(returnValue, Convert.ChangeType(arg, propertyInfo.PropertyType), null);
                     param = null;
@@ -80,10 +84,11 @@ namespace ArgumentRes.Services.implementations
                 }
                 else if (arg.StartsWith(_switchTag, System.StringComparison.Ordinal))
                 {
-                    // Switch - strip switch flag from front
+                    // This is a switch - strip the switch flag from front
                     param = arg.Substring(1);
                     if (commandLineSwitches.ContainsKey(param) && commandLineSwitches[param].PropertyType == typeof(bool))
                     {
+                        // This is a boolean switch, there is no value - just set to true so we know it was set.
                         var propertyInfo = commandLineSwitches[param];
                         propertyInfo.SetValue(returnValue, true);
                         param = null;
@@ -94,9 +99,11 @@ namespace ArgumentRes.Services.implementations
                 }
                 else
                 {
+                    // This is a simple text argument
                     var propertyInfo = commandLineParameters[propertyNumber];
                     if (propertyInfo.PropertyType == typeof(List<string>))
                     {
+                        // The argument is a string list - create the list if required then add our argument to it
                         var list = (List<string>) propertyInfo.GetValue(returnValue);
                         if (null == list)
                         {
@@ -107,6 +114,7 @@ namespace ArgumentRes.Services.implementations
                     }
                     else
                     {
+                        // The argument is a simgple string value - just set the value
                         propertyInfo.SetValue(returnValue, arg);
                         propertyNumber++;
                     }
@@ -116,6 +124,7 @@ namespace ArgumentRes.Services.implementations
                 }
             }
 
+            // If all mandatory arguments have been set, then this list should be empty
             if (mandatoryArguments.Count > 0)
             {
                 throw new ArgumentException("Expecting parameter/s " + mandatoryArguments.Select(arg => arg.Name).Aggregate((current, next) => $"{current}, {next}"));
@@ -138,8 +147,8 @@ namespace ArgumentRes.Services.implementations
         {
             var arguments = new List<Argument>();
 
-            var dummy = new T();
-            var properties = dummy.GetType().GetProperties();
+            // Iterate the properties of T to get the arguments and other flags
+            var properties = typeof(T).GetProperties();
             foreach (var property in properties)
             {
                 var attributes = property.GetCustomAttributes(true);
@@ -155,22 +164,46 @@ namespace ArgumentRes.Services.implementations
 
                 if (property.PropertyType == typeof(bool)) name = "";
 
+                // Add this parameter with it's attribute info to the list of arguments
                 arguments.Add(new Argument
                 {
                     IsSwitch = (argumentAttribute is SwitchAttribute),
-                    Key = (argumentAttribute is SwitchAttribute ? "-" : "") + argumentAttribute.Key,
+                    Key = (argumentAttribute is SwitchAttribute ? _switchTag : "") + argumentAttribute.Key,
                     Name = name,
                     Description = argumentAttribute.Description,
                     Mandatory = mandatory,
                 });
             }
 
+            // Left align the list
             var maxParamLength = arguments.Max(arg => arg.Key.Length);
+
+            foreach (var arg in arguments)
+            {
+                arg.Description = Wrap(arg.Description, maxParamLength + 3, 80);
+            }
 
             return $"{command} " 
                 + arguments.Select(arg => arg.AsParam).Aggregate((current, next) => $"{current} {next}") 
-                + "\n "
+                + "\n\n "
                 + arguments.Select(arg => arg.UsageString(maxParamLength)).Aggregate((current, next) => $"{current}\n {next}");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="description"></param>
+        /// <param name="indent"></param>
+        /// <param name="maxWidth"></param>
+        /// <returns></returns>
+        public string Wrap(string description, int indent, int maxWidth)
+        {
+            var charCount = 0;
+            var lines = description.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                .GroupBy(w => (charCount += w.Length + 1) / (maxWidth - indent))
+                .Select(g => string.Join(" ", g));
+
+            return lines.Aggregate((current, next) => $"{current}{"\n".PadRight(indent + 1)}{next}");
         }
     }
 }

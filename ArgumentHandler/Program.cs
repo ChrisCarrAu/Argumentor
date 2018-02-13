@@ -13,7 +13,8 @@ namespace ArgumentHandler
             [Mandatory]
             public int Pings { get; set; }
 
-            [Switch(Key = "t", Description = "Tengu Maru")]
+            [Switch(Key = "t", Description = "Tengu Maru is the sea where Tengu comes from. Tengu is a penguin don't you know?")]
+            [Mandatory]
             public string TenguMaru { get; set; }
 
             [Switch(Key = "x", Description = "no value")]
