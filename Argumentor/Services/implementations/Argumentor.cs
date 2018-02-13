@@ -75,10 +75,8 @@ namespace ArgumentRes.Services.implementations
                     propertyInfo.SetValue(returnValue, Convert.ChangeType(arg, propertyInfo.PropertyType), null);
                     param = null;
 
-                    if (mandatoryArguments.Contains(propertyInfo))
-                    {
-                        mandatoryArguments.Remove(propertyInfo);
-                    }
+                    // Check off this mandatory argument
+                    mandatoryArguments.Remove(propertyInfo);
                 }
                 else if (arg.StartsWith(_switchTag, System.StringComparison.Ordinal))
                 {
@@ -90,10 +88,8 @@ namespace ArgumentRes.Services.implementations
                         propertyInfo.SetValue(returnValue, true);
                         param = null;
 
-                        if (mandatoryArguments.Contains(propertyInfo))
-                        {
-                            mandatoryArguments.Remove(propertyInfo);
-                        }
+                        // Check off this mandatory argument
+                        mandatoryArguments.Remove(propertyInfo);
                     }
                 }
                 else
@@ -115,10 +111,8 @@ namespace ArgumentRes.Services.implementations
                         propertyNumber++;
                     }
 
-                    if (mandatoryArguments.Contains(propertyInfo))
-                    {
-                        mandatoryArguments.Remove(propertyInfo);
-                    }
+                    // Check off this mandatory argument
+                    mandatoryArguments.Remove(propertyInfo);
                 }
             }
 
