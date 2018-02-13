@@ -89,7 +89,21 @@ namespace ArgumentRes.Services.implementations
                 {
                     // Expecting a switch parameter
                     var propertyInfo = commandLineSwitches[param];
-                    propertyInfo.SetValue(returnValue, Convert.ChangeType(arg, propertyInfo.PropertyType), null);
+
+                    object value;
+                    var type = propertyInfo.PropertyType;
+
+                    try
+                    {
+                        // Attempt to convert the string value into the property type
+                        value = Convert.ChangeType(arg, type);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception($"Unable to cast value {arg} for switch {_switchTag}{param} to {type.Name}", e);
+                    }
+
+                    propertyInfo.SetValue(returnValue, value, null);
                     param = null;
 
                     // Check off this mandatory argument

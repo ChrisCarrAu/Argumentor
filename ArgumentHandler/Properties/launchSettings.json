@@ -2,7 +2,7 @@
   "profiles": {
     "ArgumentHandler": {
       "commandName": "Project",
-      "commandLineArgs": "-c 100 finagle -x -v tinker Oh freddled gruntbuggly,: Thy micturations are to me,(with big yawning): As plurdled gabbleblotchits,: On a lurgid bee,"
+      "commandLineArgs": "-c 123 finagle -x -t tinker Oh freddled gruntbuggly,: Thy micturations are to me,(with big yawning): As plurdled gabbleblotchits,: On a lurgid bee,"
     }
   }
 }
