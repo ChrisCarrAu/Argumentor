@@ -62,30 +62,29 @@ namespace ArgumentRes.Services.implementations
                 {
                     // Expecting a switch parameter
                     var propertyInfo = commandLineSwitches[param];
-
-                    object value;
                     var type = propertyInfo.PropertyType;
 
                     try
                     {
                         // Attempt to convert the string value into the property type
-                        value = Convert.ChangeType(arg, type);
+                        var value = Convert.ChangeType(arg, type);
+
+                        propertyInfo.SetValue(returnValue, value, null);
+                        param = null;
+
+                        // Check off this mandatory argument
+                        mandatoryArguments.Remove(propertyInfo);                    
                     }
                     catch (Exception e)
                     {
                         throw new Exception($"Unable to cast value {arg} for switch {_switchTag}{param} to {type.Name}", e);
                     }
 
-                    propertyInfo.SetValue(returnValue, value, null);
-                    param = null;
-
-                    // Check off this mandatory argument
-                    mandatoryArguments.Remove(propertyInfo);
                 }
                 else if (arg.StartsWith(_switchTag, System.StringComparison.Ordinal))
                 {
                     // This is a switch - strip the switch flag from front
-                    param = arg.Substring(1);
+                    param = arg.Substring(_switchTag.Length);
                     if (commandLineSwitches.ContainsKey(param) && commandLineSwitches[param].PropertyType == typeof(bool))
                     {
                         // This is a boolean switch, there is no value - just set to true so we know it was set.
@@ -125,7 +124,7 @@ namespace ArgumentRes.Services.implementations
             }
 
             // If all mandatory arguments have been set, then this list should be empty
-            if (mandatoryArguments.Count > 0)
+            if (mandatoryArguments.Any())
             {
                 throw new ArgumentException("Expecting parameter/s " + mandatoryArguments.Select(arg => arg.Value).Aggregate((current, next) => $"{current}, {next}"));
             }
