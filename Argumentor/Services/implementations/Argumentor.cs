@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SwitchAttribute = ArgumentRes.Attributes.SwitchAttribute;
 
 namespace ArgumentRes.Services.implementations
 {
@@ -44,42 +43,16 @@ namespace ArgumentRes.Services.implementations
         /// <inheritdoc />
         public T Parse(IEnumerable<string> args)
         {
-            var commandLineSwitches = new Dictionary<string, PropertyInfo>();
-            var commandLineParameters = new List<PropertyInfo>();
-            var mandatoryArguments = new Dictionary<PropertyInfo, string>();
-
             // Value to return after successful parsing.
             var returnValue = new T();
             var properties = returnValue.GetType().GetProperties();
 
-            // Build up the attributes for each property on T
-            foreach (var property in properties)
-            {
-                var attributes = property.GetCustomAttributes(true);
-
-                var switchAttribute = attributes.OfType<SwitchAttribute>().FirstOrDefault();
-                var parameterAttribute = attributes.OfType<ParameterAttribute>().FirstOrDefault();
-                var mandatoryAttribute = attributes.OfType<MandatoryAttribute>().FirstOrDefault();
-
-                if (null != switchAttribute)
-                { 
-                    commandLineSwitches.Add(switchAttribute.Key, property);
-                }
-                else if (null != parameterAttribute)
-                {
-                    commandLineParameters.Add(property);
-                }
-                else
-                {
-                    // Skip this one - property is neither a switch, nor a parameter
-                    continue;
-                }
-
-                if (null != mandatoryAttribute)
-                {
-                    mandatoryArguments[property] = (switchAttribute == null ? parameterAttribute.Key : switchAttribute.Key);
-                }
-            }
+            var commandLineSwitches = properties.Where(p => p.GetCustomAttributes<SwitchAttribute>().Any())
+                .ToDictionary(t => t.GetCustomAttributes<SwitchAttribute>().First().Key, t => t);
+            var commandLineParameters = properties.Where(p => p.GetCustomAttributes<ParameterAttribute>().Any())
+                .ToList();
+            var mandatoryArguments = properties.Where(p => p.GetCustomAttributes<MandatoryAttribute>().Any())
+                .ToDictionary(t => t, t => t.GetCustomAttributes<ParameterAttribute>().FirstOrDefault()?.Key);
 
             var propertyNumber = 0;
             string param = null;
