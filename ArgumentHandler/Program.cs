@@ -49,7 +49,15 @@ namespace ArgumentHandler
             {
                 var commandLineArguments = argumentor.Parse(args);
 
-                Console.WriteLine($"Pings: {commandLineArguments.Pings}");
+                Console.WriteLine($"Pings       : {commandLineArguments.Pings}");
+                Console.WriteLine($"TenguMaru   : {commandLineArguments.TenguMaru}");
+                Console.WriteLine($"IsSet       : {commandLineArguments.IsSet}");
+                Console.WriteLine($"VictoryName : {commandLineArguments.VictoryName}");
+                Console.WriteLine($"Host        : {commandLineArguments.Host}");
+                foreach (var s in commandLineArguments.FilesToProcess)
+                {
+                    Console.WriteLine($"Argument    : {s}");
+                }
             }
             catch (Exception e)
             {
