@@ -8,12 +8,6 @@ namespace ArgumentRes.Tests.UnitTests
 {
     public class CommandLineParserTest
     {
-        public class Arguments_BoolSwitch
-        {
-            [Switch(Key = "switch", Description = "Switch details")]
-            [Mandatory]
-            public bool Switch { get; set; }
-        }
         public class Arguments_OneOrMore
         {
             [Parameter(Key = "args", Description = "Arguments")]
@@ -44,16 +38,6 @@ namespace ArgumentRes.Tests.UnitTests
             public string Host { get; set; }
             [Parameter(Key = "args", Description = "Arguments")]
             public List<string> Arguments { get; set; }
-        }
-
-
-        [Fact]
-        public void OnParse_OnlySwitchWithNoValue_ParsesCorrectly()
-        {
-            var argumentor = new Argumentor<Arguments_BoolSwitch>();
-            var arguments = argumentor.Parse(new string[] {"-switch"});
-
-            Assert.True(arguments.Switch);
         }
 
         [Fact]
