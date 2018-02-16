@@ -21,17 +21,17 @@ namespace ArgumentRes.Tests.UnitTests
         }
         public class Arguments_Complex
         {
-            [Switch(Key = "c", Description = "The number of pings to send")]
+            [Flag(Key = "c", Description = "The number of pings to send")]
             [Mandatory]
             public int Pings { get; set; }
-            [Switch(Key = "t", Description = "Tengu maru")]
+            [Flag(Key = "t", Description = "Tengu maru")]
             public string TenguMaru { get; set; }
-            [Switch(Key = "u", Description = "Umbrella count for those days when the rain doth pour in buckets and the hoi polloi do cower in corners and alleyways in fear of becoming wettened and soggy")]
+            [Flag(Key = "u", Description = "Umbrella count for those days when the rain doth pour in buckets and the hoi polloi do cower in corners and alleyways in fear of becoming wettened and soggy")]
             public string Umbrella { get; set; }
             [Mandatory]
-            [Switch(Key = "v", Description = "Victor is an exceedingly handsome fellow")]
+            [Flag(Key = "v", Description = "Victor is an exceedingly handsome fellow")]
             public string Victor { get; set; }
-            [Switch(Key = "w", Description = "With enough help, anything is possible")]
+            [Flag(Key = "w", Description = "With enough help, anything is possible")]
             public string Whisky { get; set; }
             [Parameter(Key = "host", Description = "The name of the host")]
             [Mandatory]

@@ -8,7 +8,7 @@ namespace ArgumentRes.Tests.UnitTests
     {
         internal class Arguments_BoolSwitch
         {
-            [Switch(Key = "switch", Description = "Switch details")]
+            [Flag(Key = "switch", Description = "Switch details")]
             public bool Switch { get; set; }
         }
 

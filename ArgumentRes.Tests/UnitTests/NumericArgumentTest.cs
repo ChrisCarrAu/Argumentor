@@ -8,19 +8,19 @@ namespace ArgumentRes.Tests.UnitTests
     {
         internal class Arguments_IntegerValue
         {
-            [Switch(Key = "i", Description = "Integer value")]
+            [Flag(Key = "i", Description = "Integer value")]
             public int IntegerValue { get; set; }
 
-            [Switch(Key = "l", Description = "Long value")]
+            [Flag(Key = "l", Description = "Long value")]
             public long LongValue { get; set; }
 
-            [Switch(Key = "dec", Description = "Decimal value")]
+            [Flag(Key = "dec", Description = "Decimal value")]
             public decimal DecimalValue { get; set; }
 
-            [Switch(Key = "d", Description = "Double value")]
+            [Flag(Key = "d", Description = "Double value")]
             public double DoubleValue { get; set; }
 
-            [Switch(Key = "f", Description = "Float value")]
+            [Flag(Key = "f", Description = "Float value")]
             public float FloatValue { get; set; }
         }
 

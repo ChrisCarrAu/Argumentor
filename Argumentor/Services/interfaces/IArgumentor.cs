@@ -14,12 +14,5 @@ namespace ArgumentRes.Services.interfaces
         /// <param name="args">Arguments to parse</param>
         /// <returns>Parsed arguments</returns>
         T Parse(IEnumerable<string> args);
-
-        /// <summary>
-        /// Returns a Usage string which can be displayed to the console.
-        /// </summary>
-        /// <param name="command">The name of this executable - often App,</param>
-        /// <returns></returns>
-        string Usage(string command);
     }
 }
