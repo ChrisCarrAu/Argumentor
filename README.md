@@ -44,7 +44,7 @@ arguments.Switch
 If invalid arguments are passed to the parser, an ArgumentException is thrown. The Usage information can be displayed by making a call to
 
 ```C#
-argumentor.Usage()
+new UsageFormatter<Arguments>().ToString()
 ```
 ```
 ERROR Expecting switches: v
