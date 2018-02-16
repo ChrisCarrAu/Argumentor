@@ -37,7 +37,7 @@ namespace ArgumentRes.Services.implementations
         /// Uses the application process name as the command name.
         /// </summary>
         /// <returns></returns>
-        public string ToString()
+        public new string ToString()
         {
             return ToString(AppDomain.CurrentDomain.FriendlyName);
         }

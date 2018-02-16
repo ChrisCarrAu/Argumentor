@@ -2,7 +2,7 @@
 
 namespace ArgumentRes.Services.interfaces
 {
-    public interface IArgumentor<T>
+    public interface IArgumentor<out T>
     {
         /// <summary>
         /// Takes an array of strings - for example, from a command line 

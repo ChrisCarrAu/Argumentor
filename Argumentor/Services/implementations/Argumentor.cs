@@ -5,6 +5,10 @@ using System.Linq;
 
 namespace ArgumentRes.Services.implementations
 {
+    /// <summary>
+    /// Converts command line arguments into an object of type T
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class Argumentor<T> : IArgumentor<T> where T : new()
     {
         /// <summary>
