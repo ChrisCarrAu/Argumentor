@@ -8,16 +8,16 @@ Command Line Argument processor
 internal class Arguments
 {
     // For example, to process a mandatory switch like so: -c 100
-    [Switch(Key = "c", Description="Number of pings to send")]
+    [Flag(Key = "c", Description="Number of pings to send")]
     [Mandatory]
     public int Pings { get; set; }
 
     // To process an optional switch like so: -t yes
-    [Switch(Key = "t", Description = "Tengu Maru")]
+    [Flag(Key = "t", Description = "Tengu Maru")]
     public string TenguMaru { get; set; }
 
     // To add a boolean switch with no value like so: -switch
-    [Switch(Key = "switch", Description = "no value")]
+    [Flag(Key = "switch", Description = "no value")]
     public bool Switch { get; set; }
 
     // Add individual parameter arguments by name.
